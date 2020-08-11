@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stories-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stories
+  template:
+    metadata:
+      labels:
+        app: stories
+    spec:
+      containers:
+        - name: stories
+          image: shubhamjain2908/stories
+          env:
+            - name: NATS_CLUSTER_ID
+              value: "hackernewshub"
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: "http://nats-srv:4222"
+            - name: MONGO_URI
+              value: "mongodb://stories-mongo-srv:27017/stories"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stories-srv
+spec:
+  selector:
+    app: stories
+  ports:
+    - name: stories
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
