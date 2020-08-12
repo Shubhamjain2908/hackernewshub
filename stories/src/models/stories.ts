@@ -4,8 +4,8 @@ import mongoose from 'mongoose';
 export interface StoryAttrs {
     by: string,
     descendants?: number,
-    id: string | number,
-    kids?: Array<number | string>
+    id: number,
+    kids?: Array<number>
     score: number,
     time: string,
     title: string,
@@ -23,9 +23,9 @@ export interface StoryDoc extends mongoose.Document {
     title: string,
     url: string,
     score: number,
-    createdAt: string,
+    createdAt: Number,
     user: string,
-    storyId: string,
+    storyId: number,
     comments: Array<number>
 }
 
@@ -42,7 +42,7 @@ const storySchema = new mongoose.Schema(
             type: Number
         },
         createdAt: {
-            type: String,
+            type: Number,
             required: true
         },
         user: {
@@ -53,7 +53,7 @@ const storySchema = new mongoose.Schema(
             type: Array
         },
         storyId: {
-            type: String,
+            type: Number,
             required: true,
             unique: true
         }
