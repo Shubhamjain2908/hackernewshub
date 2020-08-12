@@ -1,19 +1,25 @@
 import axios from 'axios';
 import express, { Request, Response } from 'express';
+import { StoryCreatedPublisher } from '../events/publishers/story-created-publishers';
 import { Story, StoryAttrs, StoryDoc } from '../models/stories';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
 router.get('/top-stories', async (req: Request, res: Response) => {
     let stories: Array<StoryDoc>;
     stories = await getStoriesFromOurDatastore();
-    if (!stories) {
+    if (!stories?.length) {
         const storyObjects: Array<StoryAttrs> = await getStoriesFromHNFirestore();;
         stories = await saveStoriesToDB(storyObjects);
     }
     res.status(201).send({ stories });
 });
 
+/**
+ * Method to fetch stories from MongoDB
+ * @returns storyDocument
+ */
 const getStoriesFromOurDatastore = async (): Promise<Array<StoryDoc>> => {
     return await Story.find({}).sort({ score: -1 });
 }
@@ -50,6 +56,12 @@ const saveStoriesToDB = async (stories: Array<StoryAttrs>): Promise<Array<StoryD
     });
     // Saving all records at once
     const savedRecord: Array<StoryDoc> = await Promise.all(storyBuildObject);
+
+    // Publishing an event
+    await new StoryCreatedPublisher(natsWrapper.client).publish({
+        story: savedRecord
+    });
+
     return savedRecord;
 }
 
