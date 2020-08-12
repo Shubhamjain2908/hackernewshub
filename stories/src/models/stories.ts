@@ -23,7 +23,7 @@ export interface StoryDoc extends mongoose.Document {
     title: string,
     url: string,
     score: number,
-    createdAt: Number,
+    createdAt: number,
     user: string,
     storyId: number,
     comments: Array<number>
