@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 // An interface that describes the prop that are req to create a new Story
-interface StoryAttrs {
+export interface StoryAttrs {
     by: string,
     descendants?: number,
     id: string | number,
@@ -19,12 +19,14 @@ interface StoryModel extends mongoose.Model<StoryDoc> {
 }
 
 // An interface that describes the properties that a Story Document has
-interface StoryDoc extends mongoose.Document {
+export interface StoryDoc extends mongoose.Document {
     title: string,
     url: string,
     score: number,
     createdAt: string,
-    user: string
+    user: string,
+    storyId: string,
+    comments: Array<number>
 }
 
 const storySchema = new mongoose.Schema(
@@ -34,12 +36,10 @@ const storySchema = new mongoose.Schema(
             required: true
         },
         url: {
-            type: String,
-            required: true
+            type: String
         },
         score: {
-            type: String,
-            required: true
+            type: Number
         },
         createdAt: {
             type: String,
@@ -54,7 +54,8 @@ const storySchema = new mongoose.Schema(
         },
         storyId: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         }
     },
     {
