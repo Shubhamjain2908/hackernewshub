@@ -10,10 +10,10 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
     async onMessage(data: ExpirationCompleteEvent['data'], msg: Message) {
 
         const { stories } = data;
-        // Find the ticket that the stories is reserving
+        // Find all the stories
         const storiesExists = await Story.find({ storyId: { $in: stories } });
 
-        // If no ticket, throw error
+        // If no stories, throw error
         if (!storiesExists) {
             throw new Error('Stories not found');
         }
