@@ -24,3 +24,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: shubhamjain2908/history
+      context: history
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .

@@ -14,3 +14,7 @@ spec:
             backend:
               serviceName: stories-srv
               servicePort: 3000
+          - path: /past-stories/?(.*)
+            backend:
+              serviceName: history-srv
+              servicePort: 3000

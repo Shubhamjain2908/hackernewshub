@@ -14,7 +14,7 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
         const storiesExists = await Story.find({ storyId: { $in: stories } });
 
         // If no stories, throw error
-        if (!storiesExists) {
+        if (!storiesExists?.length) {
             throw new Error('Stories not found');
         }
 

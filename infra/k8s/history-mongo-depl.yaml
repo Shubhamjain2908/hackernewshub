@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: history-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: history-mongo
+  template:
+    metadata:
+      labels:
+        app: history-mongo
+    spec:
+      containers:
+        - name: history-mongo
+          image: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: history-mongo-srv
+spec:
+  selector:
+    app: history-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
