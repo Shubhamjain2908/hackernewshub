@@ -64,7 +64,8 @@ const saveStoriesToDB = async (stories: Array<StoryAttrs>): Promise<Array<StoryD
             storyId: v.storyId,
             title: v.title,
             url: v.url,
-            user: v.user
+            user: v.user,
+            score: v.score
         }
     });
     // Publishing an event
