@@ -15,25 +15,21 @@ const start = async () => {
         throw new Error('NATS_CLUSTER_ID must be defined');
     }
 
-    try {
-        await natsWrapper.connect(
-            process.env.NATS_CLUSTER_ID,
-            process.env.NATS_CLIENT_ID,
-            process.env.NATS_URL
-        );
+    await natsWrapper.connect(
+        process.env.NATS_CLUSTER_ID,
+        process.env.NATS_CLIENT_ID,
+        process.env.NATS_URL
+    );
 
-        natsWrapper.client.on('close', () => {
-            console.log('Expiration Service : Nats connection closed!');
-            process.exit();
-        });
+    natsWrapper.client.on('close', () => {
+        console.log('Expiration Service : Nats connection closed!');
+        process.exit();
+    });
 
-        process.on('SIGINT', () => natsWrapper.client.close());
-        process.on('SIGTERM', () => natsWrapper.client.close());
+    process.on('SIGINT', () => natsWrapper.client.close());
+    process.on('SIGTERM', () => natsWrapper.client.close());
 
-        new StoryCreatedListener(natsWrapper.client).listen();
-    } catch (err) {
-        console.error('Startup error => ', err);
-    }
+    new StoryCreatedListener(natsWrapper.client).listen();
 
 };
 

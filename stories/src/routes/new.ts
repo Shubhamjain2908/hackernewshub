@@ -14,7 +14,7 @@ router.get('/top-stories', async (req: Request, res: Response) => {
         const storyObjects: Array<StoryAttrs> = await getStoriesFromHNFirestore();;
         stories = await saveStoriesToDB(storyObjects);
     }
-    res.status(201).send({ stories });
+    res.status(200).send({ stories });
 });
 
 /**

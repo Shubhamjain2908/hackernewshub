@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { app } from './app';
+import { ExpirationCompleteListener } from './events/listeners/expiration-complete-listeners';
 import { natsWrapper } from './nats-wrapper';
 
 const start = async () => {
@@ -18,30 +19,28 @@ const start = async () => {
         throw new Error('NATS_CLUSTER_ID must be defined');
     }
 
-    try {
-        await natsWrapper.connect(
-            process.env.NATS_CLUSTER_ID,
-            process.env.NATS_CLIENT_ID,
-            process.env.NATS_URL
-        );
+    await natsWrapper.connect(
+        process.env.NATS_CLUSTER_ID,
+        process.env.NATS_CLIENT_ID,
+        process.env.NATS_URL
+    );
 
-        natsWrapper.client.on('close', () => {
-            console.log('Nats connection closed!');
-            process.exit();
-        });
+    natsWrapper.client.on('close', () => {
+        console.log('Nats connection closed!');
+        process.exit();
+    });
 
-        process.on('SIGINT', () => natsWrapper.client.close());
-        process.on('SIGTERM', () => natsWrapper.client.close());
+    process.on('SIGINT', () => natsWrapper.client.close());
+    process.on('SIGTERM', () => natsWrapper.client.close());
 
-        await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useCreateIndex: true
-        });
-        console.log('Stories Service: Connected to MongoDB!!!')
-    } catch (err) {
-        console.error('Startup error => ', err);
-    }
+    new ExpirationCompleteListener(natsWrapper.client).listen();
+
+    await mongoose.connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true
+    });
+    console.log('Stories Service: Connected to MongoDB!!!');
 
     app.listen(3000, () => {
         console.log('Stories Service: Listening on port 3000!')
