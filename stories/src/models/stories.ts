@@ -26,7 +26,8 @@ export interface StoryDoc extends mongoose.Document {
     createdAt: number,
     user: string,
     storyId: number,
-    comments: Array<number>
+    comments?: Array<number>,
+    isExpired?: boolean
 }
 
 const storySchema = new mongoose.Schema(
@@ -56,6 +57,10 @@ const storySchema = new mongoose.Schema(
             type: Number,
             required: true,
             unique: true
+        },
+        isExpired: {
+            type: Boolean,
+            default: false
         }
     },
     {

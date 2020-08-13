@@ -1,3 +1,4 @@
+import { StoryEventModel } from '@hn-hub/common';
 import axios from 'axios';
 import express, { Request, Response } from 'express';
 import { StoryCreatedPublisher } from '../events/publishers/story-created-publishers';
@@ -21,7 +22,7 @@ router.get('/top-stories', async (req: Request, res: Response) => {
  * @returns storyDocument
  */
 const getStoriesFromOurDatastore = async (): Promise<Array<StoryDoc>> => {
-    return await Story.find({}).sort({ score: -1 });
+    return await Story.find({ isExpired: false }).sort({ score: -1 });
 }
 
 /**
@@ -56,10 +57,19 @@ const saveStoriesToDB = async (stories: Array<StoryAttrs>): Promise<Array<StoryD
     });
     // Saving all records at once
     const savedRecord: Array<StoryDoc> = await Promise.all(storyBuildObject);
-
+    const eventStoryData: Array<StoryEventModel> = savedRecord.map(v => {
+        return {
+            comments: v.comments!,
+            createdAt: v.createdAt,
+            storyId: v.storyId,
+            title: v.title,
+            url: v.url,
+            user: v.user
+        }
+    });
     // Publishing an event
     await new StoryCreatedPublisher(natsWrapper.client).publish({
-        story: savedRecord
+        story: eventStoryData
     });
 
     return savedRecord;
