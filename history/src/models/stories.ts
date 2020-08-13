@@ -2,15 +2,13 @@ import mongoose from 'mongoose';
 
 // An interface that describes the prop that are req to create a new Story
 export interface StoryAttrs {
-    by: string,
-    descendants?: number,
-    id: number,
-    kids?: Array<number>
-    score: number,
-    time: string,
+    storyId: number,
     title: string,
-    type?: string,
-    url: string
+    url: string,
+    score: number,
+    createdAt: number,
+    user: string,
+    comments: Array<number>
 }
 
 // An interface that describes the properties that a Story model has
@@ -26,8 +24,7 @@ export interface StoryDoc extends mongoose.Document {
     createdAt: number,
     user: string,
     storyId: number,
-    comments?: Array<number>,
-    isExpired?: boolean
+    isExpired: boolean
 }
 
 const storySchema = new mongoose.Schema(
@@ -43,8 +40,7 @@ const storySchema = new mongoose.Schema(
             type: Number
         },
         createdAt: {
-            type: Number,
-            required: true
+            type: Number
         },
         user: {
             type: String,
@@ -55,8 +51,7 @@ const storySchema = new mongoose.Schema(
         },
         storyId: {
             type: Number,
-            required: true,
-            unique: true
+            required: true
         },
         isExpired: {
             type: Boolean,
@@ -75,15 +70,7 @@ const storySchema = new mongoose.Schema(
 );
 
 storySchema.statics.build = (attrs: StoryAttrs) => {
-    return new Story({
-        title: attrs.title,
-        url: attrs.url,
-        score: attrs.score,
-        createdAt: attrs.time,
-        user: attrs.by,
-        comments: attrs.kids,
-        storyId: attrs.id
-    });
+    return new Story(attrs);
 };
 
 const Story = mongoose.model<StoryDoc, StoryModel>('Story', storySchema);

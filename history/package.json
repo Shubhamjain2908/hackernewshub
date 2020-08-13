@@ -19,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@hn-hub/common": "^1.0.6",
+    "@hn-hub/common": "^1.0.7",
     "@types/express": "^4.17.6",
     "@types/mongoose": "^5.7.27",
     "express": "^4.17.1",

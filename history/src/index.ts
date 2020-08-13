@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { ExpirationCompleteListener } from './events/listeners/expiration-complete-listener';
+import { StoryCreatedListener } from './events/listeners/story-created-listener';
 import { natsWrapper } from './nats-wrapper';
 
 const start = async () => {
@@ -33,6 +34,7 @@ const start = async () => {
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
 
+    new StoryCreatedListener(natsWrapper.client).listen();
     new ExpirationCompleteListener(natsWrapper.client).listen();
 
     await mongoose.connect(process.env.MONGO_URI, {
@@ -40,10 +42,10 @@ const start = async () => {
         useUnifiedTopology: true,
         useCreateIndex: true
     });
-    console.log('Stories Service: Connected to MongoDB!!!');
+    console.log('History Service: Connected to MongoDB!!!');
 
     app.listen(3000, () => {
-        console.log('Stories Service: Listening on port 3000!')
+        console.log('History Service: Listening on port 3000!')
     });
 
 };
