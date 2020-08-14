@@ -8,7 +8,6 @@ export class StoryCreatedListener extends Listener<StoryCreatedEvent> {
     queueGroupName = queueGroupName;
 
     async onMessage(data: StoryCreatedEvent['data'], msg: Message) {
-        console.log('StoryCreatedEvent listener from History');
         const { story } = data;
         const storyIds = story.map(s => s.storyId);
 

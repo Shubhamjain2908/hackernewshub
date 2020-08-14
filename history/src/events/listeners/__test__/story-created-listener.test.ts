@@ -1,8 +1,8 @@
-import { ExpirationCompleteEvent } from '@hn-hub/common';
+import { StoryCreatedEvent, StoryEventModel } from '@hn-hub/common';
 import { Message } from 'node-nats-streaming';
 import { Story, StoryDoc } from '../../../models/stories';
 import { natsWrapper } from '../../../nats-wrapper';
-import { ExpirationCompleteListener } from '../expiration-complete-listener';
+import { StoryCreatedListener } from '../story-created-listener';
 
 const storyData = [
     {
@@ -31,13 +31,34 @@ const storyData = [
     }
 ];
 
+const eventData: Array<StoryEventModel> = [
+    {
+        comments: [24135784],
+        createdAt: 15972562131,
+        score: 1123,
+        storyId: 24161010,
+        title: 'Google com',
+        url: 'https://google.com',
+        user: 'SJ'
+    },
+    {
+        comments: [
+            24135784
+        ],
+        title: 'Mozilla Lifeboat',
+        url: 'https://mozillalifeboat.com',
+        score: 1432,
+        createdAt: 1597256213,
+        user: 'gkoberger',
+        storyId: 24135032
+    }
+];
+
 const setup = async () => {
-    const listener = new ExpirationCompleteListener(natsWrapper.client);
+    const listener = new StoryCreatedListener(natsWrapper.client);
     // Saving all records at once
     const stories: Array<StoryDoc> = await Story.insertMany(storyData);
-    const data: ExpirationCompleteEvent['data'] = {
-        stories: stories.map(e => e.storyId)
-    };
+    const data: StoryCreatedEvent['data'] = { story: eventData };
 
     // @ts-ignore
     const msg: Message = {
@@ -47,15 +68,26 @@ const setup = async () => {
     return { listener, stories, data, msg };
 };
 
-
-it('delete all the given stories', async () => {
+it('create new stories', async () => {
     const { listener, data, msg } = await setup();
+
+    await Story.deleteMany({});
 
     await listener.onMessage(data, msg);
 
     const updatedStory = await Story.find({});
 
     expect(updatedStory.length).toEqual(2);
+});
+
+it('update one existing story & create one new', async () => {
+    const { listener, data, msg } = await setup();
+
+    await listener.onMessage(data, msg);
+
+    const updatedStory = await Story.find({});
+
+    expect(updatedStory.length).toEqual(3);
 });
 
 it('ack the message', async () => {

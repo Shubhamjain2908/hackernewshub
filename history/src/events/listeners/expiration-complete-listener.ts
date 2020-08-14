@@ -8,7 +8,6 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
     queueGroupName = queueGroupName;
 
     async onMessage(data: ExpirationCompleteEvent['data'], msg: Message) {
-        console.log('ExpirationCompleteEvent listener from History');
         const { stories } = data;
         const storyBuildObject: any[] = [];
         stories.forEach(id => {
