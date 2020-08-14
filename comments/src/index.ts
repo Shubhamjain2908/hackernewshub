@@ -40,10 +40,10 @@ const start = async () => {
         useUnifiedTopology: true,
         useCreateIndex: true
     });
-    console.log('History Service: Connected to MongoDB!!!');
+    console.log('Comments Service: Connected to MongoDB!!!');
 
     app.listen(3000, () => {
-        console.log('History Service: Listening on port 3000!')
+        console.log('Comments Service: Listening on port 3000!')
     });
 
 };
