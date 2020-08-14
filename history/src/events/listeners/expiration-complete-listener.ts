@@ -8,21 +8,15 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
     queueGroupName = queueGroupName;
 
     async onMessage(data: ExpirationCompleteEvent['data'], msg: Message) {
-
+        console.log('ExpirationCompleteEvent listener from History');
         const { stories } = data;
-        // Find all the stories
-        const storiesExists = await Story.find({ storyId: { $in: stories } });
-
-        // If no stories, throw error
-        if (!storiesExists) {
-            throw new Error('Stories not found');
-        }
-
-        // delete the expired story
-        const deletedStories = await Story.deleteMany({ storyId: { $in: stories } });
-
-        //todo: clear from the cache
-        console.log('Deleted stories: ', deletedStories);
+        const storyBuildObject: any[] = [];
+        stories.forEach(id => {
+            const st = Story.updateOne({ storyId: id }, { isExpired: true });
+            storyBuildObject.push(st);   // chainning it into the Promise array
+        });
+        // Saving all records at once
+        await Promise.all(storyBuildObject);
 
         // ack the message
         msg.ack();
