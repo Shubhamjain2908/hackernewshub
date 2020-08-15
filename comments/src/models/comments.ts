@@ -1,11 +1,12 @@
 import mongoose from 'mongoose';
-import { UserDoc } from './User';
+import { UserDoc } from './user';
 
 // An interface that describes the prop that are req to create a new Comments
 export interface CommentsAttrs {
+    commentId: number,
     text: string,
     createdAt: number,
-    user: mongoose.Types.ObjectId,
+    user: UserDoc,
     storyId: number,
     child_comment_count: number
 }
@@ -25,6 +26,10 @@ export interface CommentsDoc extends mongoose.Document {
 
 const commentsSchema = new mongoose.Schema(
     {
+        commentId: {
+            type: String,
+            required: true
+        },
         text: {
             type: String,
             required: true
@@ -33,7 +38,7 @@ const commentsSchema = new mongoose.Schema(
             type: Number
         },
         user: {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: 'User'
         },
