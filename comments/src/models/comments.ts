@@ -22,6 +22,7 @@ export interface CommentsDoc extends mongoose.Document {
     createdAt: number,
     user: UserDoc,
     storyId: number,
+    commentId: number
 }
 
 const commentsSchema = new mongoose.Schema(

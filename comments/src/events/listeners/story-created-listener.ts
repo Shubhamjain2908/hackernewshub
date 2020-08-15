@@ -26,10 +26,19 @@ export class StoryCreatedListener extends Listener<StoryCreatedEvent> {
  */
 const getCommentsFromHNFirestore = async (comments: Array<number>): Promise<Array<CommentsDoc>> => {
 
-    let commentRequests: any[] = [];
+    // comments that does not exists in our database, returning 0 if comment exists
+    const validComments = await Promise.all(comments.map(async (c) => {
+        const commentExists = await Comments.findOne({ commentId: c });
+        if (commentExists) {
+            return 0;
+        } else {
+            return c;
+        }
+    }));
 
-    // creating the request for each comment Id
-    comments.forEach((id: number) => commentRequests.push(axios.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)));
+    let commentRequests: any[] = [];
+    // creating the request for each valid comment Id i.e., id !== 0
+    validComments.forEach((id: number) => id !== 0 && commentRequests.push(axios.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)));
     let response = await axios.all(commentRequests);  // fetching all the comment details 
     response = response.map(r => r.data);
 
@@ -60,12 +69,11 @@ const getUser = async (username: string): Promise<UserDoc> => {
     const user = await User.findOne({ user: username });
     if (user) {
         return user;
+    } else {
+        // fetch user data from HN db.
+        const { data } = await axios.get(`https://hacker-news.firebaseio.com/v0/user/${username}.json`);
+        const newUser = User.build(data);
+        await newUser.save();   // saving that user to our db
+        return newUser;
     }
-
-    // fetch user data from HN db.
-    const { data } = await axios.get(`https://hacker-news.firebaseio.com/v0/user/${username}.json`);
-    const newUser = User.build(data);
-    await newUser.save();   // saving that user to our db
-    return newUser;
-
 }
