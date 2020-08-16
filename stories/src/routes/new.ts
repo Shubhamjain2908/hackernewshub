@@ -39,7 +39,7 @@ const getStoriesFromHNFirestore = async (): Promise<Array<StoryAttrs>> => {
     storiesId.map((id: number) => storyRequests.push(axios.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)));
     const response = await axios.all(storyRequests);  // fetching all the story details 
     // mapping all the active stories
-    const allStoriesResponse: Array<StoryAttrs> = response.map(d => d.data).filter(s => s.type === 'story' && (s.deleted !== true && s.false !== true));
+    const allStoriesResponse: Array<StoryAttrs> = response.map(d => d.data).filter(s => s && s.type === 'story' && (s.deleted !== true && s.dead !== true));
     // sorting the stories on the bases of score & getting top 5 from it
     return allStoriesResponse.sort((a: StoryAttrs, b: StoryAttrs) => b.score - a.score).slice(0, 10);
     // return allStoriesResponse.filter(a => new Date(Date.now() - 600000) < new Date(+a.time)).sort((a: StoryAttrs, b: StoryAttrs) => b.score - a.score).slice(0, 10); // filter for last 10 min stories
