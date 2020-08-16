@@ -40,7 +40,7 @@ const getCommentsFromHNFirestore = async (comments: Array<number>): Promise<Arra
     // creating the request for each valid comment Id i.e., id !== 0
     validComments.forEach((id: number) => id !== 0 && commentRequests.push(axios.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)));
     let response = await axios.all(commentRequests);  // fetching all the comment details 
-    response = response.map(r => r.data);
+    response = response.map(r => r.data).filter(v => (v.deleted !== true) && (v.dead !== true));
 
     const commentsToSave: Array<CommentsAttrs> = await Promise.all(response.map(async (r) => {
         const c: CommentsAttrs = {
