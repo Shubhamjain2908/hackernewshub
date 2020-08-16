@@ -5,7 +5,7 @@ import { Comments, CommentsDoc } from '../models/comments';
 const router = express.Router();
 
 interface CommentResponse {
-    commentId: number,
+    id: number,
     text: string,
     username: string,
     usersAge: number
@@ -19,7 +19,7 @@ router.get('/comments', async (req: Request, res: Response) => {
     const comments: Array<CommentsDoc> = await Comments.find({ storyId: storyId }).sort({ child_comment_count: -1 }).populate('user');
     const commentResponse: Array<CommentResponse> = comments.map(comment => {
         return {
-            commentId: comment.commentId,
+            id: comment.id,
             text: comment.text,
             username: comment.user.user,
             usersAge: new Date(Date.now()).getFullYear() - new Date(comment.user.createdAt).getFullYear()
