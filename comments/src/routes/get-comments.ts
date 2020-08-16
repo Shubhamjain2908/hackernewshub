@@ -16,7 +16,7 @@ router.get('/comments', async (req: Request, res: Response) => {
     if (!storyId) {
         throw new BadRequestError('Story id is required');
     }
-    const comments: Array<CommentsDoc> = await Comments.find({ storyId: storyId }).sort({ child_comment_count: -1 }).populate('user');
+    const comments: Array<CommentsDoc> = await Comments.find({ storyId: storyId }).sort({ child_comment_count: -1 }).limit(10).populate('user');
     const commentResponse: Array<CommentResponse> = comments.map(comment => {
         return {
             id: comment.id,
